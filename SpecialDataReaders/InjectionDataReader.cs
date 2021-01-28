@@ -5,19 +5,19 @@ using System.Linq;
 
 namespace SpecialDataReaders
 {
-	// Currently exists to be able to add columns to an IDataReader by using a function that takes in the dataReaader at one state and generating computed columns based off that. Will maybe want to rework this to be part of teh functionality of the DataReaderExtender.
-	public class InsertionDataReader<T> : IDataReader where T : IDataReader
+	// Allows logic to be executed upon reading each row.
+	public class InjectionDataReader<T> : IDataReader where T : IDataReader
 	{
 		private T data;
 
-		public InsertionDataReader(T underlyingDataReader, params Action<T>[] injection)
+		public InjectionDataReader(T underlyingDataReader, params Action<T>[] injection)
 		{
 			readInjection = injection.AsEnumerable().GetEnumerator();
 			readInjection.MoveNext();
 			data = underlyingDataReader;
 		}
 
-		public InsertionDataReader(T underlyingDataReader, IEnumerator<Action<T>> injection)
+		public InjectionDataReader(T underlyingDataReader, IEnumerator<Action<T>> injection)
 		{
 			readInjection = injection;
 			readInjection.MoveNext();
