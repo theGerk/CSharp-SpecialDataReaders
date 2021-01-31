@@ -182,80 +182,82 @@ namespace SpecialDataReaders
 		public virtual void Set<T>(string name, IEnumerable<T> enumerable, Func<T, object> valueExtractor, string sqlType)
 			=> Set(name, (IEnumerable)enumerable, x => valueExtractor((T)x), sqlType);
 
+		/// <inheritdoc/>
 		public virtual object this[int i] => GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual object this[string name] => this[columnNames[name]];
-
+		/// <inheritdoc/>
 		public virtual int Depth => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual bool IsClosed => false;
-
+		/// <inheritdoc/>
 		public virtual int RecordsAffected => 0;
-
+		/// <inheritdoc/>
 		public virtual int FieldCount => columnNames.Count;
-
+		/// <inheritdoc/>
 		public virtual void Close() { }
-
+		/// <inheritdoc/>
 		public virtual void Dispose()
 		{
 			foreach (var item in enumerators)
 				if (item is IDisposable disposable)
 					disposable.Dispose();
 		}
-
+		/// <inheritdoc/>
 		public virtual bool GetBoolean(int i) => (bool)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual byte GetByte(int i) => (byte)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual char GetChar(int i) => (char)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length) => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual IDataReader GetData(int i) => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual string GetDataTypeName(int i) => columns[i].Type;
-
+		/// <inheritdoc/>
 		public virtual DateTime GetDateTime(int i) => (DateTime)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual decimal GetDecimal(int i) => (decimal)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual double GetDouble(int i) => (double)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual Type GetFieldType(int i) => GetValue(i).GetType();
-
+		/// <inheritdoc/>
 		public virtual float GetFloat(int i) => (float)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual Guid GetGuid(int i) => (Guid)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual short GetInt16(int i) => (short)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual int GetInt32(int i) => (int)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual long GetInt64(int i) => (long)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual string GetName(int i) => columns[i].Name;
-
+		/// <inheritdoc/>
 		public virtual int GetOrdinal(string name) => columnNames[name];
-
+		/// <inheritdoc/>
 		public virtual DataTable GetSchemaTable() => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual string GetString(int i) => (string)GetValue(i);
-
+		/// <inheritdoc/>
 		public virtual object GetValue(int i)
 		{
 			var (enumerator, extractor, _, _) = columns[i];
 			return extractor(enumerator?.Current);
 		}
-
+		/// <inheritdoc/>
 		public virtual int GetValues(object[] values) => throw new NotImplementedException();
-
+		/// <inheritdoc/>
 		public virtual bool IsDBNull(int i) => DBNull.Value.Equals(GetValue(i));
 
 		//Not sure how this should be implemented, this is kind of just a place holder
+		/// <inheritdoc/>
 		public virtual bool NextResult() => false;
-
+		/// <inheritdoc/>
 		public virtual bool Read()
 		{
 			bool hasMoreToGo = true;
