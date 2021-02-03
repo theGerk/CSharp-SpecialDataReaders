@@ -41,14 +41,14 @@ namespace SpecialDataReaders
 		protected void Set(IList<int?> columnMap)
 		{
 			columnMapping = new int[dataReader.FieldCount];
+			fieldCount = 0;
 			for (int i = 0; i < columnMap.Count; i++)
 				if (columnMap[i] is int c)
+				{
 					columnMapping[c] = i;
-
-			//gap will be counted as the end
-			int lastIndex;
-			for (lastIndex = 0; lastIndex < columnMapping.Length && columnMapping[lastIndex] >= 0; lastIndex++) { }
-			fieldCount = lastIndex;
+					if (c > fieldCount)
+						fieldCount = c;
+				}
 		}
 
 		///<inheritdoc/>
