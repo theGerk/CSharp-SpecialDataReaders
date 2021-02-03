@@ -6,21 +6,33 @@ namespace SpecialDataReaders
 	/// <summary>
 	/// This Implementation is meant to take already existing data in an <see cref="IDataReader"></see> and add additional columns.
 	/// </summary>
-	public class DataReaderExtender : EnumeratorDataReader
+	/// <typeparam name="T">The IDataReader Implementation that underlies the data</typeparam>
+	public class DataReaderExtender<T> : EnumeratorDataReader where T : IDataReader
 	{
 		/// <summary>
 		/// The underlying <see cref="IDataReader"/> that is having columns added.
 		/// </summary>
-		private readonly IDataReader data;
+		private readonly T data;
 
 		/// <summary>
 		/// Constructor taking in an <see cref="IDataReader"/> as underlying data.
 		/// </summary>
 		/// <param name="underlyingData">The initial data.</param>
-		public DataReaderExtender(IDataReader underlyingData)
+		public DataReaderExtender(T underlyingData)
 		{
 			data = underlyingData;
 			Initialize();
+		}
+
+		/// <summary>
+		/// Adds column that is computed based of a function.
+		/// </summary>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="valueExtractor">Extracts a value from the underlying data reader.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set(string name, Func<T, object> valueExtractor, string sqlType)
+		{
+			AddColumn(name, null, _ => valueExtractor(data), sqlType);
 		}
 
 		/// <summary>
@@ -41,6 +53,7 @@ namespace SpecialDataReaders
 				columnNames[data.GetName(i)] = i;
 		}
 
+		/// <inheritdoc/>
 		public override string GetDataTypeName(int i)
 		{
 			if (columns.TryGetValue(i, out var dat))
@@ -49,6 +62,7 @@ namespace SpecialDataReaders
 				return data.GetDataTypeName(i);
 		}
 
+		/// <inheritdoc/>
 		public override Type GetFieldType(int i)
 		{
 			if (columns.ContainsKey(i))
@@ -56,6 +70,8 @@ namespace SpecialDataReaders
 			else
 				return data.GetFieldType(i);
 		}
+
+		/// <inheritdoc/>
 		public override string GetName(int i)
 		{
 			if (columns.ContainsKey(i))
@@ -64,6 +80,7 @@ namespace SpecialDataReaders
 				return data.GetName(i);
 		}
 
+		/// <inheritdoc/>
 		public override object GetValue(int i)
 		{
 			if (columns.ContainsKey(i))
@@ -85,6 +102,7 @@ namespace SpecialDataReaders
 			return output;
 		}
 
+		/// <inheritdoc/>
 		public override bool Read()
 		{
 			//Note: The commented line of code below would not work as a "prettier" version of this function as short circuiting could cause undesirable results.

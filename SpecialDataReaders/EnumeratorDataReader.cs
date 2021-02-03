@@ -87,7 +87,7 @@ namespace SpecialDataReaders
 		/// <param name="enumerator">The Enumerator backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		private void AddColumn(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType)
+		protected void AddColumn(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType)
 		{
 			if (columnNames.TryGetValue(name, out int column))
 			{
