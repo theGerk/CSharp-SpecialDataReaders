@@ -31,9 +31,7 @@ namespace SpecialDataReaders
 		/// <param name="valueExtractor">Extracts a value from the underlying data reader.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
 		public virtual void Set(string name, Func<T, object> valueExtractor, string sqlType)
-		{
-			AddColumn(name, null, _ => valueExtractor(data), sqlType);
-		}
+			=> AddColumn(name, null, _ => valueExtractor(data), sqlType);
 
 		/// <summary>
 		/// Clears out all added data. The <see cref="data"></see> is left alone.
