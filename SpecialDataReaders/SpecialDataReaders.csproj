@@ -9,7 +9,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/theGerk/CSharp-SpecialDataReaders</RepositoryUrl>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
