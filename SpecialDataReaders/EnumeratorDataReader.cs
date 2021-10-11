@@ -250,7 +250,14 @@ namespace SpecialDataReaders
 			return extractor(enumerator?.Current);
 		}
 		/// <inheritdoc/>
-		public virtual int GetValues(object[] values) => throw new NotImplementedException();
+		public virtual int GetValues(object[] values)
+		{
+			int i;
+			int len = Math.Min(values.Length, FieldCount);
+			for (i = 0; i < len; i++)
+				values[i] = GetValue(i);
+			return i;
+		}
 		/// <inheritdoc/>
 		public virtual bool IsDBNull(int i) => DBNull.Value.Equals(GetValue(i));
 
