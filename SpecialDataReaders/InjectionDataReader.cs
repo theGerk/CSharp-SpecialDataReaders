@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace SpecialDataReaders
+namespace Gerk.SpecialDataReaders
 {
 	// Allows logic to be executed upon reading each row.
 	public class InjectionDataReader<T> : IDataReader where T : IDataReader

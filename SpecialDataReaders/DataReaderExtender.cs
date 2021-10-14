@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace SpecialDataReaders
+namespace Gerk.SpecialDataReaders
 {
 	/// <summary>
 	/// This Implementation is meant to take already existing data in an <see cref="IDataReader"></see> and add additional columns.

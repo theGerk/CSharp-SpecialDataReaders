@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace SpecialDataReaders
+namespace Gerk.SpecialDataReaders
 {
 	//Data reader to let you filter columns out a data reader. May want to rethink how this is designed to bring it more inline with other implementations in this file.
 	public class DataReaderFilter<T> : IDataReader where T : IDataReader

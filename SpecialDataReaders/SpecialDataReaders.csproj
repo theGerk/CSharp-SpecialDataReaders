@@ -10,6 +10,8 @@
 		<RepositoryUrl>https://github.com/theGerk/CSharp-SpecialDataReaders</RepositoryUrl>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Version>1.0.7</Version>
+		<RootNamespace>Gerk.SpecialDataReaders</RootNamespace>
+		<AssemblyName>Gerk.SpecialDataReaders</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

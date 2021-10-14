@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 
-namespace SpecialDataReaders
+namespace Gerk.SpecialDataReaders
 {
 	/// <summary>
 	/// This implementation of an IDataReader is completely backed by IEnumerator(s). It may be populated with IEnumerables or IEnumerators and will keep reading data until any of the enumerators end. This is particularly useful for Bulk Data inserts from C# data.

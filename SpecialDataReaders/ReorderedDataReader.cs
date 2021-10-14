@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
-namespace SpecialDataReaders
+namespace Gerk.SpecialDataReaders
 {
 	/// <summary>
 	/// Used to reorder the columns of a data reader or ignore some
