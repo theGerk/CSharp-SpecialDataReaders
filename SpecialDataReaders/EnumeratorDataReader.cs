@@ -399,7 +399,7 @@ namespace Gerk.SpecialDataReaders
 			return i;
 		}
 		/// <inheritdoc/>
-		public virtual bool IsDBNull(int i) => DBNull.Value.Equals(GetValue(i));
+		public virtual bool IsDBNull(int i) => GetValue(i).IsNullOrDBNull();
 
 		//Not sure how this should be implemented, this is kind of just a place holder
 		/// <inheritdoc/>
