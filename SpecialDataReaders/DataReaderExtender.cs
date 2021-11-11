@@ -30,8 +30,19 @@ namespace Gerk.SpecialDataReaders
 		/// <param name="name">The name of the column.</param>
 		/// <param name="valueExtractor">Extracts a value from the underlying data reader.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set(string name, Func<T, object> valueExtractor, string sqlType)
-			=> AddColumn(name, null, _ => valueExtractor(data), sqlType);
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void Set(string name, Func<T, object> valueExtractor, string sqlType, Type cSharpType)
+			=> AddColumn(name, null, _ => valueExtractor(data), sqlType, cSharpType);
+
+		/// <summary>
+		/// Adds column that is computed based of a function.
+		/// </summary>
+		/// <typeparam name="V">Th type of the column that <paramref name="valueExtractor"/> maps to.</typeparam>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="valueExtractor">Extracts a value from the underlying data reader.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set<V>(string name, Func<T, V> valueExtractor, string sqlType)
+			=> AddColumn(name, null, _ => valueExtractor(data), sqlType, typeof(V));
 
 		/// <summary>
 		/// Clears out all added data. The <see cref="data"></see> is left alone.
@@ -55,7 +66,7 @@ namespace Gerk.SpecialDataReaders
 		public override string GetDataTypeName(int i)
 		{
 			if (columns.TryGetValue(i, out var dat))
-				return dat.Type;
+				return dat.SqlType;
 			else
 				return data.GetDataTypeName(i);
 		}

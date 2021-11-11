@@ -43,7 +43,7 @@ namespace Gerk.SpecialDataReaders
 		///		</item>
 		/// </list>
 		/// </summary>
-		protected Dictionary<int, (IEnumerator Enumerator, Func<object, object> ValueExtractor, string Name, string Type)> columns = new Dictionary<int, (IEnumerator, Func<object, object>, string, string)>();
+		protected Dictionary<int, (IEnumerator Enumerator, Func<object, object> ValueExtractor, string Name, string SqlType, Type CSharpType)> columns = new Dictionary<int, (IEnumerator, Func<object, object>, string, string, Type)>();
 
 		/// <summary>
 		/// Clears all data from this EnumeratorDataReader.
@@ -54,7 +54,7 @@ namespace Gerk.SpecialDataReaders
 			columnNames = new Dictionary<string, int>();
 			enumerables = new Dictionary<IEnumerable, IEnumerator>();
 			enumerators = new HashSet<IEnumerator>();
-			columns = new Dictionary<int, (IEnumerator Enumerator, Func<object, object> ValueExtractor, string Name, string Type)>();
+			columns = new Dictionary<int, (IEnumerator Enumerator, Func<object, object> ValueExtractor, string Name, string Type, Type cSharpType)>();
 		}
 
 		/// <summary>
@@ -65,7 +65,7 @@ namespace Gerk.SpecialDataReaders
 			enumerators = new HashSet<IEnumerator>();
 
 			//iterate through all enumerators in use
-			foreach (var (enumerator, _, _, _) in columns.Values)
+			foreach (var (enumerator, _, _, _, _) in columns.Values)
 				if (enumerator != null)
 					enumerators.Add(enumerator);
 
@@ -87,100 +87,240 @@ namespace Gerk.SpecialDataReaders
 		/// <param name="enumerator">The Enumerator backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		protected void AddColumn(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType)
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		protected void AddColumn(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType, Type cSharpType)
 		{
 			if (columnNames.TryGetValue(name, out int column))
 			{
-				columns[column] = (enumerator, valueExtractor, name, sqlType);
+				columns[column] = (enumerator, valueExtractor, name, sqlType, cSharpType);
 			}
 			else
 			{
 				int row = columnNames.Count;
 				columnNames[name] = row;
-				columns[row] = (enumerator, valueExtractor, name, sqlType);
+				columns[row] = (enumerator, valueExtractor, name, sqlType, cSharpType);
 			}
 		}
 
 		/// <summary>
 		/// Sets a column that has the same value in every row.
-		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string)"></seealso>
 		/// </summary>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
 		/// <param name="name">Name of the column.</param>
 		/// <param name="value">The value of each row in the column.</param>
 		/// <param name="sqlType">The SQL type for the column.</param>
-		public virtual void SetConstant(string name, object value, string sqlType)
-			=> AddColumn(name, null, _ => value, sqlType);
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void SetConstant(string name, object value, string sqlType, Type cSharpType)
+			=> AddColumn(name, null, _ => value, sqlType, cSharpType);
+
+		/// <summary>
+		/// Sets a column that has the same value in every row.
+		/// </summary>
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
+		/// <typeparam name="T">Tye type of the column/constant.</typeparam>
+		/// <param name="name">Name of the column.</param>
+		/// <param name="value">The value of each row in the column.</param>
+		/// <param name="sqlType">The SQL type for the column.</param>
+		public virtual void SetConstant<T>(string name, T value, string sqlType)
+			=> SetConstant(name, value, sqlType, typeof(T));
 
 		/// <summary>
 		/// Set a column based on <see cref="IEnumerator"/>.
-		/// <seealso cref="SetConstant(string, object, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string)"></seealso>
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
 		/// </summary>
 		/// <param name="name">The name of the column.</param>
 		/// <param name="enumerator">The <see cref="IEnumerator"/> backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType)
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void Set(string name, IEnumerator enumerator, Func<object, object> valueExtractor, string sqlType, Type cSharpType)
 		{
 			enumerators.Add(enumerator);
-			AddColumn(name, enumerator, valueExtractor, sqlType);
+			AddColumn(name, enumerator, valueExtractor, sqlType, cSharpType);
 		}
 
 		/// <summary>
 		/// Set column based on <see cref="IEnumerable"/>.
-		/// <seealso cref="SetConstant(string, object, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string)"></seealso>
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
 		/// </summary>
 		/// <param name="name">The name of the column.</param>
 		/// <param name="enumerable">The <see cref="IEnumerable"/> backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerable"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set(string name, IEnumerable enumerable, Func<object, object> valueExtractor, string sqlType)
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void Set(string name, IEnumerable enumerable, Func<object, object> valueExtractor, string sqlType, Type cSharpType)
 		{
 			if (!enumerables.TryGetValue(enumerable, out var enumerator))
 			{
 				enumerator = enumerable.GetEnumerator();
 				enumerables[enumerable] = enumerator;
 			}
-			Set(name, enumerator, valueExtractor, sqlType);
+			Set(name, enumerator, valueExtractor, sqlType, cSharpType);
+		}
+
+		/// <summary>
+		/// Set a column based on <see cref="IEnumerator"/>.
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// </summary>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="enumerator">The <see cref="IEnumerator"/> backing the column.</param>
+		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set<V>(string name, IEnumerator enumerator, Func<object, V> valueExtractor, string sqlType)
+		{
+			enumerators.Add(enumerator);
+			AddColumn(name, enumerator, x => valueExtractor(x), sqlType, typeof(V));
+		}
+
+		/// <summary>
+		/// Set column based on <see cref="IEnumerable"/>.
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
+		/// </summary>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="enumerable">The <see cref="IEnumerable"/> backing the column.</param>
+		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerable"/> to corresponding column value.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set<V>(string name, IEnumerable enumerable, Func<object, V> valueExtractor, string sqlType)
+		{
+			if (!enumerables.TryGetValue(enumerable, out var enumerator))
+			{
+				enumerator = enumerable.GetEnumerator();
+				enumerables[enumerable] = enumerator;
+			}
+			Set(name, enumerator, x => valueExtractor(x), sqlType, typeof(V));
 		}
 
 		/// <summary>
 		/// Set a column based on <see cref="IEnumerator{T}"></see> in a somewhat type safe way.
-		/// <seealso cref="SetConstant(string, object, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string)"></seealso>
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
 		/// </summary>
 		/// <typeparam name="T">The type T for <paramref name="enumerator"/>.</typeparam>
 		/// <param name="name">The name of the column.</param>
 		/// <param name="enumerator">The <see cref="IEnumerator{T}"/> backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set<T>(string name, IEnumerator<T> enumerator, Func<T, object> valueExtractor, string sqlType)
-			=> Set(name, (IEnumerator)enumerator, x => valueExtractor((T)x), sqlType);
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void Set<T>(string name, IEnumerator<T> enumerator, Func<T, object> valueExtractor, string sqlType, Type cSharpType)
+			=> Set(name, (IEnumerator)enumerator, x => valueExtractor((T)x), sqlType, cSharpType);
 
 		/// <summary>
 		/// Set a column based on <see cref="IEnumerable{T}"></see> in a somewhat type safe way.
-		/// <seealso cref="SetConstant(string, object, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string)"></seealso>
-		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string)"></seealso>
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
 		/// </summary>
 		/// <typeparam name="T">The type T for <paramref name="enumerable"/>.</typeparam>
 		/// <param name="name">The name of the column.</param>
 		/// <param name="enumerable">The <see cref="IEnumerable{T}"/> backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerable"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set<T>(string name, IEnumerable<T> enumerable, Func<T, object> valueExtractor, string sqlType)
-			=> Set(name, (IEnumerable)enumerable, x => valueExtractor((T)x), sqlType);
+		/// <param name="cSharpType">The C# <see cref="Type"/> of this column.</param>
+		public virtual void Set<T>(string name, IEnumerable<T> enumerable, Func<T, object> valueExtractor, string sqlType, Type cSharpType)
+			=> Set(name, (IEnumerable)enumerable, x => valueExtractor((T)x), sqlType, cSharpType);
+
+		/// <summary>
+		/// Set a column based on <see cref="IEnumerator{T}"></see> in a fairly type safe way.
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
+		/// </summary>
+		/// <typeparam name="T">The type T for <paramref name="enumerator"/>.</typeparam>
+		/// <typeparam name="V">Th type of the column that <paramref name="valueExtractor"/> maps to.</typeparam>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="enumerator">The <see cref="IEnumerator{T}"/> backing the column.</param>
+		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerator"/> to corresponding column value.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set<T, V>(string name, IEnumerator<T> enumerator, Func<T, V> valueExtractor, string sqlType)
+			=> Set(name, (IEnumerator)enumerator, x => valueExtractor((T)x), sqlType, typeof(V));
+
+		/// <summary>
+		/// Set a column based on <see cref="IEnumerable{T}"></see> in a fairly type safe way.
+		/// <seealso cref="SetConstant(string, object, string, Type)"/>
+		/// <seealso cref="SetConstant{T}(string, T, string)"/>
+		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
+		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
+		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
+		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
+		/// </summary>
+		/// <typeparam name="T">The type T for <paramref name="enumerable"/>.</typeparam>
+		/// <typeparam name="V">Th type of the column that <paramref name="valueExtractor"/> maps to.</typeparam>
+		/// <param name="name">The name of the column.</param>
+		/// <param name="enumerable">The <see cref="IEnumerable{T}"/> backing the column.</param>
+		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerable"/> to corresponding column value.</param>
+		/// <param name="sqlType">The columns SQL type.</param>
+		public virtual void Set<T, V>(string name, IEnumerable<T> enumerable, Func<T, object> valueExtractor, string sqlType)
+			=> Set(name, (IEnumerable)enumerable, x => valueExtractor((T)x), sqlType, typeof(V));
 
 		/// <inheritdoc/>
 		public virtual object this[int i] => GetValue(i);
@@ -216,7 +356,7 @@ namespace Gerk.SpecialDataReaders
 		/// <inheritdoc/>
 		public virtual IDataReader GetData(int i) => throw new NotImplementedException();
 		/// <inheritdoc/>
-		public virtual string GetDataTypeName(int i) => columns[i].Type;
+		public virtual string GetDataTypeName(int i) => columns[i].SqlType;
 		/// <inheritdoc/>
 		public virtual DateTime GetDateTime(int i) => (DateTime)GetValue(i);
 		/// <inheritdoc/>
@@ -224,7 +364,7 @@ namespace Gerk.SpecialDataReaders
 		/// <inheritdoc/>
 		public virtual double GetDouble(int i) => (double)GetValue(i);
 		/// <inheritdoc/>
-		public virtual Type GetFieldType(int i) => GetValue(i).GetType();
+		public virtual Type GetFieldType(int i) => columns[i].CSharpType;
 		/// <inheritdoc/>
 		public virtual float GetFloat(int i) => (float)GetValue(i);
 		/// <inheritdoc/>
@@ -246,7 +386,7 @@ namespace Gerk.SpecialDataReaders
 		/// <inheritdoc/>
 		public virtual object GetValue(int i)
 		{
-			var (enumerator, extractor, _, _) = columns[i];
+			var (enumerator, extractor, _, _, _) = columns[i];
 			return extractor(enumerator?.Current);
 		}
 		/// <inheritdoc/>
