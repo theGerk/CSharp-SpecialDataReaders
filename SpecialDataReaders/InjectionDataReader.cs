@@ -2,14 +2,48 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Gerk.LinqExtensions;
 
 namespace Gerk.SpecialDataReaders
 {
-	// Allows logic to be executed upon reading each row.
+	/// <summary>
+	/// Allows logic to executed upon reading of each row.
+	/// </summary>
+	/// <typeparam name="T">Underlying datareader type</typeparam>
 	public class InjectionDataReader<T> : IDataReader where T : IDataReader
 	{
-		private T data;
+		/// <summary>
+		/// Helper method, makes enumerator that infinitly returns the same value.
+		/// </summary>
+		/// <typeparam name="U"></typeparam>
+		/// <param name="original"></param>
+		/// <returns></returns>
+		private static IEnumerator<U> InfiniteOf<U>(U original)
+		{
+			while (true)
+				yield return original;
+		}
 
+		private readonly T data;
+		private readonly IEnumerator<Action<T>> readInjection;
+
+		/// <summary>
+		/// Constructs injection datareader
+		/// </summary>
+		/// <param name="underlyingDataReader">Underlying datareader.</param>
+		/// <param name="injection">Function is called on each call of <see cref="Read"/>.</param>
+		public InjectionDataReader(T underlyingDataReader, Action<T> injection)
+		{
+			readInjection = InfiniteOf(injection);
+			readInjection.MoveNext();
+			data = underlyingDataReader;
+		}
+
+		/// <summary>
+		/// Constructs injection datareader
+		/// </summary>
+		/// <param name="underlyingDataReader">Underlying datareader.</param>
+		/// <param name="injection">The injected functions that get called on each read. Only one of these is used at a time, and each call to <see cref="InjectionDataReader{T}.NextResult"/> steps to the next function.</param>
 		public InjectionDataReader(T underlyingDataReader, params Action<T>[] injection)
 		{
 			readInjection = injection.AsEnumerable().GetEnumerator();
@@ -17,6 +51,11 @@ namespace Gerk.SpecialDataReaders
 			data = underlyingDataReader;
 		}
 
+		/// <summary>
+		/// Constructs injection datareader
+		/// </summary>
+		/// <param name="underlyingDataReader">Underlying datareader.</param>
+		/// <param name="injection">The injected functions that get called on each read. Only one of these is used at a time, and each call to <see cref="InjectionDataReader{T}.NextResult"/> steps to the next function.</param>
 		public InjectionDataReader(T underlyingDataReader, IEnumerator<Action<T>> injection)
 		{
 			readInjection = injection;
@@ -24,162 +63,114 @@ namespace Gerk.SpecialDataReaders
 			data = underlyingDataReader;
 		}
 
+		/// <inheritdoc/>
 		public object this[int i] => data[i];
 
+		/// <inheritdoc/>
 		public object this[string name] => data[name];
 
+		/// <inheritdoc/>
 		public int Depth => data.Depth;
 
+		/// <inheritdoc/>
 		public bool IsClosed => data.IsClosed;
 
+		/// <inheritdoc/>
 		public int RecordsAffected => data.RecordsAffected;
 
+		/// <inheritdoc/>
 		public int FieldCount => data.FieldCount;
 
-		public void Close()
-		{
-			data.Close();
-		}
+		/// <inheritdoc/>
+		public void Close() => data.Close();
 
-		public void Dispose()
-		{
-			data.Dispose();
-		}
+		/// <inheritdoc/>
+		public void Dispose() => data.Dispose();
 
-		public bool GetBoolean(int i)
-		{
-			return data.GetBoolean(i);
-		}
+		/// <inheritdoc/>
+		public bool GetBoolean(int i) => data.GetBoolean(i);
 
-		public byte GetByte(int i)
-		{
-			return data.GetByte(i);
-		}
+		/// <inheritdoc/>
+		public byte GetByte(int i) => data.GetByte(i);
 
-		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
-		{
-			return data.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
-		}
+		/// <inheritdoc/>
+		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) => data.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 
-		public char GetChar(int i)
-		{
-			return data.GetChar(i);
-		}
+		/// <inheritdoc/>
+		public char GetChar(int i) => data.GetChar(i);
 
-		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
-		{
-			return data.GetChars(i, fieldoffset, buffer, bufferoffset, length);
-		}
+		/// <inheritdoc/>
+		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length) => data.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 
-		public IDataReader GetData(int i)
-		{
-			return data.GetData(i);
-		}
+		/// <inheritdoc/>
+		public IDataReader GetData(int i) => data.GetData(i);
 
-		public string GetDataTypeName(int i)
-		{
-			return data.GetDataTypeName(i);
-		}
+		/// <inheritdoc/>
+		public string GetDataTypeName(int i) => data.GetDataTypeName(i);
 
-		public DateTime GetDateTime(int i)
-		{
-			return data.GetDateTime(i);
-		}
+		/// <inheritdoc/>
+		public DateTime GetDateTime(int i) => data.GetDateTime(i);
 
-		public decimal GetDecimal(int i)
-		{
-			return data.GetDecimal(i);
-		}
+		/// <inheritdoc/>
+		public decimal GetDecimal(int i) => data.GetDecimal(i);
 
-		public double GetDouble(int i)
-		{
-			return data.GetDouble(i);
-		}
+		/// <inheritdoc/>
+		public double GetDouble(int i) => data.GetDouble(i);
 
-		public Type GetFieldType(int i)
-		{
-			return data.GetFieldType(i);
-		}
+		/// <inheritdoc/>
+		public Type GetFieldType(int i) => data.GetFieldType(i);
 
-		public float GetFloat(int i)
-		{
-			return data.GetFloat(i);
-		}
+		/// <inheritdoc/>
+		public float GetFloat(int i) => data.GetFloat(i);
 
-		public Guid GetGuid(int i)
-		{
-			return data.GetGuid(i);
-		}
+		/// <inheritdoc/>
+		public Guid GetGuid(int i) => data.GetGuid(i);
 
-		public short GetInt16(int i)
-		{
-			return data.GetInt16(i);
-		}
+		/// <inheritdoc/>
+		public short GetInt16(int i) => data.GetInt16(i);
 
-		public int GetInt32(int i)
-		{
-			return data.GetInt32(i);
-		}
+		/// <inheritdoc/>
+		public int GetInt32(int i) => data.GetInt32(i);
 
-		public long GetInt64(int i)
-		{
-			return data.GetInt64(i);
-		}
+		/// <inheritdoc/>
+		public long GetInt64(int i) => data.GetInt64(i);
 
-		public string GetName(int i)
-		{
-			return data.GetName(i);
-		}
+		/// <inheritdoc/>
+		public string GetName(int i) => data.GetName(i);
 
-		public int GetOrdinal(string name)
-		{
-			return data.GetOrdinal(name);
-		}
+		/// <inheritdoc/>
+		public int GetOrdinal(string name) => data.GetOrdinal(name);
 
-		public DataTable GetSchemaTable()
-		{
-			return data.GetSchemaTable();
-		}
+		/// <inheritdoc/>
+		public DataTable GetSchemaTable() => data.GetSchemaTable();
 
-		public string GetString(int i)
-		{
-			return data.GetString(i);
-		}
+		/// <inheritdoc/>
+		public string GetString(int i) => data.GetString(i);
 
-		public object GetValue(int i)
-		{
-			return data.GetValue(i);
-		}
+		/// <inheritdoc/>
+		public object GetValue(int i) => data.GetValue(i);
 
-		public int GetValues(object[] values)
-		{
-			return data.GetValues(values);
-		}
+		/// <inheritdoc/>
+		public int GetValues(object[] values) => data.GetValues(values);
 
-		public bool IsDBNull(int i)
-		{
-			return data.IsDBNull(i);
-		}
+		/// <inheritdoc/>
+		public bool IsDBNull(int i) => data.IsDBNull(i);
 
+		/// <inheritdoc/>
 		public bool NextResult()
 		{
 			readInjection.MoveNext();
 			return data.NextResult();
 		}
 
-		private IEnumerator<Action<T>> readInjection;
 
+		/// <inheritdoc/>
 		public bool Read()
 		{
-			if (data.Read())
-			{
+			bool output = data.Read();
+			if (output)
 				readInjection.Current(data);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return output;
 		}
 	}
 }
