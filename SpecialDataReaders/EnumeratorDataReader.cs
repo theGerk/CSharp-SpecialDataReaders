@@ -108,7 +108,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
@@ -127,13 +127,13 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant(string, object, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
 		/// <seealso cref="Set{V}(string, IEnumerator, Func{object, V}, string)"/>
-		/// <typeparam name="T">Tye type of the column/constant.</typeparam>
+		/// <typeparam name="T">The type of the column/constant.</typeparam>
 		/// <param name="name">Name of the column.</param>
 		/// <param name="value">The value of each row in the column.</param>
 		/// <param name="sqlType">The SQL type for the column.</param>
@@ -146,7 +146,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant(string, object, string, Type)"/>
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
@@ -169,7 +169,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant(string, object, string, Type)"/>
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
@@ -197,7 +197,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
@@ -219,7 +219,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
@@ -245,7 +245,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
@@ -266,7 +266,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T, V}(string, IEnumerator{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
@@ -287,7 +287,7 @@ namespace Gerk.SpecialDataReaders
 		/// <seealso cref="SetConstant{T}(string, T, string)"/>
 		/// <seealso cref="Set(string, IEnumerable, Func{object, object}, string, Type)"/>
 		/// <seealso cref="Set(string, IEnumerator, Func{object, object}, string, Type)"/>
-		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, object}, string)"/>
+		/// <seealso cref="Set{T, V}(string, IEnumerable{T}, Func{T, V}, string)"/>
 		/// <seealso cref="Set{T}(string, IEnumerable{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{T}(string, IEnumerator{T}, Func{T, object}, string, Type)"/>
 		/// <seealso cref="Set{V}(string, IEnumerable, Func{object, V}, string)"/>
@@ -319,7 +319,7 @@ namespace Gerk.SpecialDataReaders
 		/// <param name="enumerable">The <see cref="IEnumerable{T}"/> backing the column.</param>
 		/// <param name="valueExtractor">Function mapping from element of <paramref name="enumerable"/> to corresponding column value.</param>
 		/// <param name="sqlType">The columns SQL type.</param>
-		public virtual void Set<T, V>(string name, IEnumerable<T> enumerable, Func<T, object> valueExtractor, string sqlType)
+		public virtual void Set<T, V>(string name, IEnumerable<T> enumerable, Func<T, V> valueExtractor, string sqlType)
 			=> Set(name, (IEnumerable)enumerable, x => valueExtractor((T)x), sqlType, typeof(V));
 
 		/// <inheritdoc/>
