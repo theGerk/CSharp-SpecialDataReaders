@@ -36,7 +36,7 @@ namespace Gerk.SpecialDataReaders
 		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) => dr.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 		public char GetChar(int i) => dr.GetChar(i);
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length) => dr.GetChars(i, fieldoffset, buffer, bufferoffset, length);
-		public IDataReader GetData(int i) => dr.GetData(i);
+		public IDataReader GetData(int i) => dr.GetData(i).MapDBNullsToNulls();
 		public string GetDataTypeName(int i) => dr.GetDataTypeName(i);
 		public DateTime GetDateTime(int i) => dr.GetDateTime(i);
 		public decimal GetDecimal(int i) => dr.GetDecimal(i);
