@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
+using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Gerk.SpecialDataReaders
 {
-	internal class DBNullToNullDataReader : IDataReader
+	internal class DBNullToNullDataReader<T> : IDataReaderWrapper<T> where T : IDataReader
 	{
-		private readonly IDataReader dr;
+		private readonly T dr;
 
-		public DBNullToNullDataReader(IDataReader dr)
+		internal DBNullToNullDataReader(T dr)
 		{
 			this.dr = dr;
 		}
+
+		public T UnderlyingDataReader => dr;
 
 		public object this[int i] => dr[i].DBNullToNull();
 

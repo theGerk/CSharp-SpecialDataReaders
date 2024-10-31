@@ -53,13 +53,13 @@ namespace Gerk.SpecialDataReaders
 		/// </summary>
 		/// <param name="dr">the datareader</param>
 		/// <returns>a new datareader with the mapping applied</returns>
-		public static IDataReader MapNullsToDBNulls(this IDataReader dr) => new NullToDBNullDataReader(dr);
+		public static IDataReaderWrapper<T> MapNullsToDBNulls<T>(this T dr) where T : IDataReader => new NullToDBNullDataReader<T>(dr);
 
 		/// <summary>
 		/// Maps all <see cref="DBNull.Value"/> in <paramref name="dr"/> to <see langword="null"/>.
 		/// </summary>
 		/// <param name="dr">the datareader</param>
 		/// <returns>a new datareader with the mapping applied</returns>
-		public static IDataReader MapDBNullsToNulls(this IDataReader dr) => new DBNullToNullDataReader(dr);
+		public static IDataReaderWrapper<T> MapDBNullsToNulls<T>(this T dr) where T : IDataReader => new DBNullToNullDataReader<T>(dr);
 	}
 }

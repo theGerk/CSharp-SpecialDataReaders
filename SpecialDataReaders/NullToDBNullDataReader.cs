@@ -5,14 +5,16 @@ using System.Text;
 
 namespace Gerk.SpecialDataReaders
 {
-	internal class NullToDBNullDataReader : IDataReader
+	internal class NullToDBNullDataReader<T> : IDataReaderWrapper<T> where T : IDataReader
 	{
-		private readonly IDataReader dr;
+		private readonly T dr;
 
-		public NullToDBNullDataReader(IDataReader dr)
+		internal NullToDBNullDataReader(T dr)
 		{
 			this.dr = dr;
 		}
+
+		public T UnderlyingDataReader => dr;
 
 		public object this[int i] => dr[i].NullToDBNull();
 
