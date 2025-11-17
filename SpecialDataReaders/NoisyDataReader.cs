@@ -30,7 +30,7 @@ namespace Gerk.SpecialDataReaders
 			get
 			{
 				log($"object this[int i] - {nameof(i)}: {i}");
-				var output = ((IDataRecord)innerReader)[i];
+				var output = innerReader[i];
 				log($"object this[int i] - {nameof(i)}: {i} => {output}");
 				return output;
 			}
@@ -42,7 +42,7 @@ namespace Gerk.SpecialDataReaders
 			get
 			{
 				log($"object this[string name] - {nameof(name)}: {name}");
-				var output = ((IDataRecord)innerReader)[name];
+				var output = innerReader[name];
 				log($"object this[string name] - {nameof(name)}: {name} => {output}");
 				return output;
 			}
